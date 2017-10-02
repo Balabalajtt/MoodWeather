@@ -8,10 +8,7 @@ import android.content.SharedPreferences;
 import android.os.IBinder;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
-import android.support.annotation.IntDef;
-import android.widget.Toast;
 
-import com.example.moodweather.WeatherActivity;
 import com.example.moodweather.gson.Weather;
 import com.example.moodweather.util.HttpUtil;
 import com.example.moodweather.util.Utility;
