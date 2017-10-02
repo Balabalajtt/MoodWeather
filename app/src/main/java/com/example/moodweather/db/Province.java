@@ -3,13 +3,13 @@ package com.example.moodweather.db;
 import org.litepal.crud.DataSupport;
 
 /**
- * Created by 江婷婷 on 2017/9/25.
+ * LitePal省实体类
  */
 
 public class Province extends DataSupport {
     private int id;
     private String provinceName;
-    protected int provinceCode;
+    private int provinceCode;
 
     public int getId() {
         return id;

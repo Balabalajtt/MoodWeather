@@ -33,9 +33,6 @@ import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
 
-/**
- * Created by 江婷婷 on 2017/9/25.
- */
 
 public class ChooseAreaFragment extends Fragment {
 
@@ -65,10 +62,6 @@ public class ChooseAreaFragment extends Fragment {
      * 加载布局
      * 获取控件实例
      * 初始设置适配器
-     * @param inflater
-     * @param container
-     * @param savedInstanceState
-     * @return
      */
     @Nullable
     @Override
@@ -81,7 +74,7 @@ public class ChooseAreaFragment extends Fragment {
         listView = (ListView) view.findViewById(R.id.list_view);
         RelativeLayout headLayout = (RelativeLayout) view.findViewById(R.id.head_relative_layout);
 
-        adapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1, dataList);
+        adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1, dataList);
         listView.setAdapter(adapter);
 
         if (getActivity() instanceof WeatherActivity) {
@@ -95,7 +88,6 @@ public class ChooseAreaFragment extends Fragment {
     /**
      * 判断type设置listView点击事件选择省市
      * 判断type设置backButton点击事件返回上一层
-     * @param savedInstanceState
      */
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
@@ -118,11 +110,11 @@ public class ChooseAreaFragment extends Fragment {
                         startActivity(intent);
                         getActivity().finish();
                     } else if (getActivity() instanceof WeatherActivity) {
-                        queryProvinces();
+                        queryProvinces();//使侧滑重新回选择省份
                         WeatherActivity activity = (WeatherActivity) getActivity();
                         activity.drawerLayout.closeDrawers();
                         activity.swipeRefresh.setRefreshing(true);
-                        activity.setWeatherId(weatherId);
+                        activity.setWeatherId(weatherId);//使之后刷新不会回到之前选择的城市天气
                         activity.requestWeather(weatherId);
                     }
                 }
@@ -175,7 +167,7 @@ public class ChooseAreaFragment extends Fragment {
         titleText.setText(selectedProvince.getProvinceName());
         backButton.setVisibility(View.VISIBLE);
         cityList = DataSupport.where("provinceid = ?",
-                String.valueOf(selectedProvince.getId())).find(City.class);
+                String.valueOf(selectedProvince.getId())).find(City.class);//通过省份id寻找数据库里的城市信息
         if (cityList.size() > 0) {
             dataList.clear();
             for (City city : cityList) {
@@ -217,6 +209,7 @@ public class ChooseAreaFragment extends Fragment {
 
 
     /**
+     * 创建Callback
      * 根据传入地址和类型从服务器上查询省市县数据
      * @param address
      * @param type
@@ -225,7 +218,7 @@ public class ChooseAreaFragment extends Fragment {
 
         showProgressDialog();
 
-
+        //构造callback
         Callback callback = new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
@@ -256,7 +249,7 @@ public class ChooseAreaFragment extends Fragment {
                         @Override
                         public void run() {
                             closeProgressDialog();
-                            if ("province".equals(type)) {//处理好数据之后的重新加载数据
+                            if ("province".equals(type)) {//重新加载数据
                                 queryCities();
                             } else if ("city".equals(type)) {
                                 queryCities();

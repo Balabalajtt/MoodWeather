@@ -2,11 +2,6 @@ package com.example.moodweather.gson;
 
 import com.google.gson.annotations.SerializedName;
 
-/**
- * Created by 江婷婷 on 2017/9/25.
- * 单日天气实体类
- */
-
 public class Forecast {
     public String date;
 

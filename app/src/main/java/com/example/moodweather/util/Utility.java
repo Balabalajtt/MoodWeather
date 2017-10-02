@@ -13,19 +13,19 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
- * Created by 江婷婷 on 2017/9/25.
+ * 工具类解析JSON数据
  */
 
 public class Utility {
 
     /**
-     * 解析处理服务器返回的省级数据
-     * @param response
-     * @return
+     * 解析服务器返回的省级数据
+     * 组装成实体类存入数据库
      */
     public static boolean handleProvinceResponse(String response) {
-        if (!TextUtils.isEmpty(response)) {
+        if (!TextUtils.isEmpty(response)) {//判断response是否为空 ""/null
             try {
+                //JSONObject解析JSON数据
                 JSONArray allProvince = new JSONArray(response);
                 for (int i = 0; i < allProvince.length(); i++) {
                     JSONObject provinceObject = allProvince.getJSONObject(i);
@@ -45,10 +45,8 @@ public class Utility {
 
 
     /**
-     * 解析和处理服务器返回的市级数据
-     * @param response
-     * @param provinceId
-     * @return
+     * 解析服务器返回的市级数据
+     * 组装成实体类存入数据库
      */
     public static boolean handleCityResponse(String response, int provinceId) {
         if (!TextUtils.isEmpty(response)) {
@@ -72,10 +70,8 @@ public class Utility {
 
 
     /**
-     * 解析和处理服务器返回的县级数据
-     * @param response
-     * @param cityId
-     * @return
+     * 解析服务器返回的区县级数据
+     * 组装成实体类存入数据库
      */
     public static boolean handleCountyResponse(String response, int cityId) {
         if (!TextUtils.isEmpty(response)) {
@@ -99,14 +95,16 @@ public class Utility {
 
 
     /**
+     * GSON解析天气数据
      * 将返回的JSON数据解析成 Weather实体类
      */
     public static Weather handleWeatherResponse (String response) {
         try {
             JSONObject jsonObject = new JSONObject(response);
+            //看返回数据HeWeather是一个数组 数组只有一个元素就是想要的
             JSONArray jsonArray = jsonObject.getJSONArray("HeWeather");
             String weatherContent = jsonArray.getJSONObject(0).toString();
-            return new Gson().fromJson(weatherContent, Weather.class);
+            return new Gson().fromJson(weatherContent, Weather.class);//解析到Weather实体类
         } catch (JSONException e) {
             e.printStackTrace();
         }

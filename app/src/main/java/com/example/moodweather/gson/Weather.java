@@ -4,11 +4,6 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
-/**
- * Created by 江婷婷 on 2017/9/25.
- * 总实体类
- */
-
 public class Weather {
 
     public String status;//成功返回“ok” 失败发牛具体原因
@@ -17,6 +12,6 @@ public class Weather {
     public Now now;
     public Suggestion suggestion;
 
-    @SerializedName("daily_forecast")
-    public List<Forecast> forecastList;
+    @SerializedName("daily_forecast") //使用不同命名要注解JSON字段和Java字段建立映射关系
+    public List<Forecast> forecastList;//单日天气实体类Forecast的集合
 }

@@ -34,7 +34,7 @@
                 <TextView
                     android:id="@+id/aqi_text"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="50dp"
                     android:layout_gravity="center"
                     android:textColor="#fff"
                     android:textSize="40sp"/>
@@ -44,7 +44,8 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:text="AQI指数"
-                    android:textColor="#fff"/>
+                    android:textColor="#fff"
+                    android:layout_marginBottom="10dp"/>
             </LinearLayout>
         </RelativeLayout>
 
@@ -61,7 +62,7 @@
                 <TextView
                     android:id="@+id/pm25_text"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="50dp"
                     android:layout_gravity="center"
                     android:textColor="#fff"
                     android:textSize="40sp"/>
@@ -71,7 +72,8 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:text="PM2.5指数"
-                    android:textColor="#fff"/>
+                    android:textColor="#fff"
+                    android:layout_marginBottom="10dp"/>
             </LinearLayout>
         </RelativeLayout>
 

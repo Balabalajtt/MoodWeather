@@ -3,7 +3,7 @@ package com.example.moodweather.db;
 import org.litepal.crud.DataSupport;
 
 /**
- * Created by 江婷婷 on 2017/9/25.
+ * LitePal市实体类
  */
 
 public class City extends DataSupport {
