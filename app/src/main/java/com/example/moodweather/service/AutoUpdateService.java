@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.os.IBinder;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
+import android.util.Log;
 
 import com.example.moodweather.gson.Weather;
 import com.example.moodweather.util.HttpUtil;
@@ -20,25 +21,53 @@ import okhttp3.Callback;
 import okhttp3.Response;
 
 public class AutoUpdateService extends Service {
+    long triggerAtTime;
+    int choice;
     public AutoUpdateService() {
     }
 
     @Override
     public IBinder onBind(Intent intent) {
+
         return null;
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        updateWeather();
 
-        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
         int anHour = 60 * 60 * 1000;
-        long triggerAtTime = SystemClock.elapsedRealtime() + 8 * anHour;
-        Intent i = new Intent(this, AutoUpdateService.class);
-        PendingIntent pendingIntent = PendingIntent.getService(this, 0, i, 0);
-        alarmManager.cancel(pendingIntent);
-        alarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, triggerAtTime, pendingIntent);
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        choice = preferences.getInt("frequenceChoice", 1);
+        Log.d("lalall", "onStartCommand: " + choice);
+        switch (choice) {
+            case 0:
+                triggerAtTime = SystemClock.elapsedRealtime() + 5 * 60 * 1000;
+                break;
+            case 1:
+                triggerAtTime = SystemClock.elapsedRealtime() + 4 * anHour;
+                break;
+            case 2:
+                triggerAtTime = SystemClock.elapsedRealtime() + 8 * anHour;
+                break;
+            case 3:
+                triggerAtTime = SystemClock.elapsedRealtime() + 24 * anHour;
+                break;
+            case 4:
+                triggerAtTime = -1;
+                break;
+        }
+
+        if (triggerAtTime != -1) {
+
+            updateWeather();
+
+            AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+            Intent i = new Intent(this, AutoUpdateService.class);
+            PendingIntent pendingIntent = PendingIntent.getService(this, 0, i, 0);
+            alarmManager.cancel(pendingIntent);
+            alarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, triggerAtTime, pendingIntent);
+
+        }
 
         return super.onStartCommand(intent, flags, startId);
     }

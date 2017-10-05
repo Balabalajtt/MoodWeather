@@ -53,23 +53,30 @@ public class WeatherActivity extends AppCompatActivity {
     public DrawerLayout drawerLayout;
 
     private int tempUnitChoice = 0;
-    private double frequenceChoice = 2;
+    private int frequenceChoice = 2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_weather);
 
-        Intent intent = getIntent();
-        tempUnitChoice = intent.getIntExtra("tempUnitChoice", 0);
-        frequenceChoice = intent.getIntExtra("frequenceChoice", 2);
-        Log.d("lalalll", "onCreate: " + tempUnitChoice + frequenceChoice);
-
         //初始
         initViews();
 
-        //如果有天气数据就直接显示否则去通过MainActivity传来的weather_id获取天气数据
+
+
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        tempUnitChoice = preferences.getInt("tempUnitChoice", 0);
+        frequenceChoice = preferences.getInt("frequenceChoice", 2);
+        Log.d("lalalll", "onCreate: " + tempUnitChoice + frequenceChoice);
+
+        //如果有天气数据就直接显示否则去通过MainActivity传来的weather_id获取天气数据
+        preferences = PreferenceManager.getDefaultSharedPreferences(this);
         String weatherString = preferences.getString("weather", null);
         if (weatherString != null) {
             Weather weather = Utility.handleWeatherResponse(weatherString);
@@ -80,9 +87,7 @@ public class WeatherActivity extends AppCompatActivity {
             weatherLayout.setVisibility(View.INVISIBLE);
             requestWeather(mWeatherId);//获取天气数据
         }
-
     }
-
 
     /**
      * 初始化view
@@ -135,7 +140,7 @@ public class WeatherActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Intent intent = new Intent(WeatherActivity.this, SettingsActivity.class);
                 startActivity(intent);
-                finish();
+//                finish();
             }
         });
     }
@@ -242,6 +247,7 @@ public class WeatherActivity extends AppCompatActivity {
         weatherLayout.setVisibility(View.VISIBLE);
 
         Intent intent = new Intent(this, AutoUpdateService.class);
+//        intent.putExtra("hour", frequenceChoice);
         startService(intent);
     }
 
