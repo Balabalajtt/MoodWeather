@@ -10,6 +10,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -34,7 +35,7 @@ public class WeatherActivity extends AppCompatActivity {
 
     private ScrollView weatherLayout;
     private TextView titleCity;
-    private TextView titleUpdateTime;
+//    private TextView titleUpdateTime;
     private TextView degreeText;
     private TextView weatherInfoText;
     private LinearLayout forecastLayout;
@@ -43,6 +44,7 @@ public class WeatherActivity extends AppCompatActivity {
     private TextView comfortText;
     private TextView carWashText;
     private TextView sportText;
+    private Button settingsButton;
 
     public SwipeRefreshLayout swipeRefresh;
 
@@ -50,10 +52,18 @@ public class WeatherActivity extends AppCompatActivity {
 
     public DrawerLayout drawerLayout;
 
+    private int tempUnitChoice = 0;
+    private double frequenceChoice = 2;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_weather);
+
+        Intent intent = getIntent();
+        tempUnitChoice = intent.getIntExtra("tempUnitChoice", 0);
+        frequenceChoice = intent.getIntExtra("frequenceChoice", 2);
+        Log.d("lalalll", "onCreate: " + tempUnitChoice + frequenceChoice);
 
         //初始
         initViews();
@@ -89,7 +99,7 @@ public class WeatherActivity extends AppCompatActivity {
 
         weatherLayout = (ScrollView) findViewById(R.id.weather_layout);
         titleCity = (TextView) findViewById(R.id.title_city);
-        titleUpdateTime = (TextView) findViewById(R.id.title_update_time);
+//        titleUpdateTime = (TextView) findViewById(R.id.title_update_time);
         degreeText = (TextView) findViewById(R.id.degree_text);
         weatherInfoText = (TextView) findViewById(R.id.weather_info_text);
         forecastLayout = (LinearLayout) findViewById(R.id.forecast_layout);
@@ -116,6 +126,16 @@ public class WeatherActivity extends AppCompatActivity {
             @Override
             public void onRefresh() {
                 requestWeather(mWeatherId);
+            }
+        });
+
+        settingsButton = (Button) findViewById(R.id.setting);
+        settingsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(WeatherActivity.this, SettingsActivity.class);
+                startActivity(intent);
+                finish();
             }
         });
     }
@@ -182,7 +202,7 @@ public class WeatherActivity extends AppCompatActivity {
         String weatherInfo = weather.now.more.info;
 
         titleCity.setText(cityName);
-        titleUpdateTime.setText("更新时间" + updateTime);
+//        titleUpdateTime.setText("更新时间" + updateTime);
         degreeText.setText(degree);
         weatherInfoText.setText(weatherInfo);
 
@@ -213,9 +233,9 @@ public class WeatherActivity extends AppCompatActivity {
             pm25Text.setText("暂无数据");
             pm25Text.setTextSize(20);
         }
-        String comfort = "舒适度" + weather.suggestion.comfort.info;
-        String carWash = "洗车指数" + weather.suggestion.carWash.info;
-        String sport = "运动建议" + weather.suggestion.sport.info;
+        String comfort = "舒适度：" + weather.suggestion.comfort.info;
+        String carWash = "洗车指数：" + weather.suggestion.carWash.info;
+        String sport = "运动建议：" + weather.suggestion.sport.info;
         comfortText.setText(comfort);
         carWashText.setText(carWash);
         sportText.setText(sport);
