@@ -9,9 +9,9 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 
 public class SettingsActivity extends AppCompatActivity {
@@ -62,7 +62,6 @@ public class SettingsActivity extends AppCompatActivity {
                 showSingleAlertDialog(items, title, tempUnitChoice, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface arg0, int index) {
-                        Toast.makeText(SettingsActivity.this, items[index], Toast.LENGTH_SHORT).show();
                         tempUnitChoice = index;
                         SharedPreferences.Editor editor = PreferenceManager.
                                 getDefaultSharedPreferences(SettingsActivity.this).
@@ -83,7 +82,6 @@ public class SettingsActivity extends AppCompatActivity {
                 showSingleAlertDialog(items, title, (int) frequenceChoice, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface arg0, int index) {
-                        Toast.makeText(SettingsActivity.this, items[index], Toast.LENGTH_SHORT).show();
                         frequenceChoice = index;
                         SharedPreferences.Editor editor = PreferenceManager.
                                 getDefaultSharedPreferences(SettingsActivity.this).
@@ -100,9 +98,13 @@ public class SettingsActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 AlertDialog.Builder alertBuilder = new AlertDialog.Builder(SettingsActivity.this);
-                alertBuilder.setMessage("\n\t\t\t\t\t\t\t\t天气数据来源于和天气\n\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tcreated by jtt\n");
+                alertBuilder.setMessage("\n\t\t\t\t\t天气数据来源于和天风气\n\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tcreated by jtt\n");
                 alertDialog = alertBuilder.create();
                 alertDialog.show();
+                WindowManager.LayoutParams params = alertDialog.getWindow().getAttributes();
+                params.width = 900;
+                params.height = 450 ;
+                alertDialog.getWindow().setAttributes(params);
             }
         });
 

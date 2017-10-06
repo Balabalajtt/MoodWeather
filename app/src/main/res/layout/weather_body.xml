@@ -36,11 +36,9 @@
                     android:layout_height="wrap_content"
                     android:fitsSystemWindows="true">
 
-
-
                     <TextView
                         android:layout_width="match_parent"
-                        android:layout_height="500dp"/>
+                        android:layout_height="475dp"/>
 
                     <include layout="@layout/now"/>
                     <include layout="@layout/forecast"/>

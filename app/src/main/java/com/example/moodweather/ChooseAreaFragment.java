@@ -2,7 +2,6 @@ package com.example.moodweather;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -13,7 +12,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -72,14 +70,14 @@ public class ChooseAreaFragment extends Fragment {
         titleText = (TextView) view.findViewById(R.id.title_text);
         backButton = (Button) view.findViewById(R.id.back_button);
         listView = (ListView) view.findViewById(R.id.list_view);
-        RelativeLayout headLayout = (RelativeLayout) view.findViewById(R.id.head_relative_layout);
+//        RelativeLayout headLayout = (RelativeLayout) view.findViewById(R.id.head_relative_layout);
 
         adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1, dataList);
         listView.setAdapter(adapter);
 
-        if (getActivity() instanceof WeatherActivity) {
-            headLayout.setBackgroundColor(Color.argb(255,146,172,193));
-        }
+//        if (getActivity() instanceof WeatherActivity) {
+//            headLayout.setBackgroundColor(Color.argb(255,146,172,193));
+//        }
 
         return view;
     }
@@ -128,7 +126,10 @@ public class ChooseAreaFragment extends Fragment {
                     queryCities();
                 } else if (currentLevel == LEVEL_CITY) {
                     queryProvinces();
-                }
+                } //else if (currentLevel == LEVEL_PROVINCE) {
+//                    WeatherActivity activity = (WeatherActivity) getActivity();
+//                    activity.drawerLayout.closeDrawers();
+//                }
             }
         });
 
@@ -143,7 +144,7 @@ public class ChooseAreaFragment extends Fragment {
      */
     private void queryProvinces() {
         titleText.setText("中国");
-        backButton.setVisibility(View.GONE);
+        backButton.setVisibility(View.INVISIBLE);
         provinceList = DataSupport.findAll(Province.class);//从数据库获取
 
         if (provinceList.size() > 0) {//数据库有数据读取到list时

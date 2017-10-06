@@ -2,6 +2,7 @@ package com.example.moodweather;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Build;
 import android.preference.PreferenceManager;
@@ -14,6 +15,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -45,6 +47,7 @@ public class WeatherActivity extends AppCompatActivity {
     private TextView carWashText;
     private TextView sportText;
     private Button settingsButton;
+    private ImageView imageView;
 
     public SwipeRefreshLayout swipeRefresh;
 
@@ -113,6 +116,7 @@ public class WeatherActivity extends AppCompatActivity {
         comfortText = (TextView) findViewById(R.id.comfort_text);
         carWashText = (TextView) findViewById(R.id.car_wash_text);
         sportText = (TextView) findViewById(R.id.sport_text);
+        imageView = (ImageView) findViewById(R.id.degree_image);
 
         //侧滑
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -202,14 +206,26 @@ public class WeatherActivity extends AppCompatActivity {
      */
     private void showWeatherInfo(Weather weather) {
         String cityName = weather.basic.cityName;
-        String updateTime = weather.basic.update.updateTime.split(" ")[1];
-        String degree = weather.now.temperature + "°C";
+//        String updateTime = weather.basic.update.updateTime.split(" ")[1];
+        String degree = weather.now.temperature;
         String weatherInfo = weather.now.more.info;
+        if (weatherInfo.equals("多云") || weatherInfo.equals("晴间多云")) {
+            imageView.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.mipmap.cloudy));
+        } else if (weatherInfo.equals("小雨") || weatherInfo.equals("阵雨")) {
+            imageView.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.mipmap.rain));
+        } else if (weatherInfo.equals("阴")) {
+            imageView.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.mipmap.overcast));
+        }
 
         titleCity.setText(cityName);
 //        titleUpdateTime.setText("更新时间" + updateTime);
-        degreeText.setText(degree);
-        weatherInfoText.setText(weatherInfo);
+
+        if (tempUnitChoice == 1) {
+            degreeText.setText(huaShiDu(degree) + "°");
+        } else {
+            degreeText.setText(degree + "°");
+        }
+
 
         //添加listView
         forecastLayout.removeAllViews();
@@ -222,8 +238,15 @@ public class WeatherActivity extends AppCompatActivity {
             TextView minText = (TextView) view.findViewById(R.id.min_text);
             dateText.setText(forecast.date);
             infoText.setText(forecast.more.info);
-            maxText.setText(forecast.temperature.max);
-            minText.setText(forecast.temperature.min);
+            if (tempUnitChoice == 1) {
+                weatherInfoText.setText(weatherInfo + "   " + huaShiDu(forecast.temperature.min) + "°/" + huaShiDu(forecast.temperature.max) + "℉");
+                maxText.setText(huaShiDu(forecast.temperature.max) + "℉");
+                minText.setText(huaShiDu(forecast.temperature.min) + "℉");
+            } else {
+                weatherInfoText.setText(weatherInfo + "   " + forecast.temperature.min + "°/" + forecast.temperature.max + "℃");
+                maxText.setText(forecast.temperature.max + "℃");
+                minText.setText(forecast.temperature.min + "℃");
+            }
             forecastLayout.addView(view);
         }
 
@@ -249,6 +272,10 @@ public class WeatherActivity extends AppCompatActivity {
         Intent intent = new Intent(this, AutoUpdateService.class);
 //        intent.putExtra("hour", frequenceChoice);
         startService(intent);
+    }
+
+    private int huaShiDu(String degree) {
+        return (int) (Integer.parseInt(degree) * 1.8 + 32);
     }
 
     public void setWeatherId(String weatherId) {
