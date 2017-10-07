@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -55,6 +56,9 @@ public class ChooseAreaFragment extends Fragment {
 
     private int currentLevel;
 
+    private EditText editText;
+    private Button searchButton;
+
 
     /**
      * 加载布局
@@ -70,14 +74,23 @@ public class ChooseAreaFragment extends Fragment {
         titleText = (TextView) view.findViewById(R.id.title_text);
         backButton = (Button) view.findViewById(R.id.back_button);
         listView = (ListView) view.findViewById(R.id.list_view);
+        editText = (EditText) view.findViewById(R.id.city_input_edit_text);
+        searchButton = (Button) view.findViewById(R.id.search_city_button);
+        searchButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String name = editText.getText().toString();
+
+            }
+        });
 //        RelativeLayout headLayout = (RelativeLayout) view.findViewById(R.id.head_relative_layout);
 
         adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1, dataList);
         listView.setAdapter(adapter);
 
-//        if (getActivity() instanceof WeatherActivity) {
-//            headLayout.setBackgroundColor(Color.argb(255,146,172,193));
-//        }
+        if (getActivity() instanceof MainActivity) {
+            titleText.setPadding(280, 10, 0, 0);
+        }
 
         return view;
     }
@@ -172,7 +185,7 @@ public class ChooseAreaFragment extends Fragment {
         if (cityList.size() > 0) {
             dataList.clear();
             for (City city : cityList) {
-                dataList.add(city.getCityName());
+                dataList.add(selectedProvince.getProvinceName() + " - " + city.getCityName());
             }
             adapter.notifyDataSetChanged();
             listView.setSelection(0);
@@ -195,7 +208,7 @@ public class ChooseAreaFragment extends Fragment {
         if (countyList.size() > 0) {
             dataList.clear();
             for (County county : countyList) {
-                dataList.add(county.getCountyName());
+                dataList.add(selectedProvince.getProvinceName() + " - " + selectedCity.getCityName() + " - " + county.getCountyName());
             }
             adapter.notifyDataSetChanged();
             listView.setSelection(0);

@@ -14,4 +14,7 @@ public class Weather {
 
     @SerializedName("daily_forecast") //使用不同命名要注解JSON字段和Java字段建立映射关系
     public List<Forecast> forecastList;//单日天气实体类Forecast的集合
+
+    public List<Alarm> alarms;
+
 }

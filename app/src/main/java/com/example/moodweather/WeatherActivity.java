@@ -1,5 +1,7 @@
 package com.example.moodweather;
 
+import android.app.Notification;
+import android.app.NotificationManager;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.BitmapFactory;
@@ -11,6 +13,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,6 +24,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.moodweather.gson.Alarm;
 import com.example.moodweather.gson.Forecast;
 import com.example.moodweather.gson.Weather;
 import com.example.moodweather.service.AutoUpdateService;
@@ -65,8 +69,6 @@ public class WeatherActivity extends AppCompatActivity {
 
         //初始
         initViews();
-
-
 
     }
 
@@ -209,12 +211,36 @@ public class WeatherActivity extends AppCompatActivity {
 //        String updateTime = weather.basic.update.updateTime.split(" ")[1];
         String degree = weather.now.temperature;
         String weatherInfo = weather.now.more.info;
-        if (weatherInfo.equals("多云") || weatherInfo.equals("晴间多云")) {
-            imageView.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.mipmap.cloudy));
-        } else if (weatherInfo.equals("小雨") || weatherInfo.equals("阵雨")) {
-            imageView.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.mipmap.rain));
-        } else if (weatherInfo.equals("阴")) {
-            imageView.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.mipmap.overcast));
+        if (weather.alarms != null && !weather.alarms.isEmpty()) {
+            Log.d("kkk", "showWeatherInfo: " + weather.alarms.get(0));
+            for (Alarm alarm : weather.alarms) {
+                NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+                Notification notification = new NotificationCompat.Builder(this)
+                        .setContentTitle(alarm.title)
+                        .setContentText(alarm.level + " " + alarm.type)
+                        .setWhen(System.currentTimeMillis())
+                        .build();
+                manager.notify(weather.alarms.indexOf(alarm), notification);
+            }
+        }
+        switch (weatherInfo) {
+            case "晴":
+                imageView.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.mipmap.sunny));
+                break;
+            case "多云":
+            case "晴间多云":
+                imageView.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.mipmap.cloudy));
+                break;
+            case "小雨":
+            case "阵雨":
+                imageView.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.mipmap.rain));
+                break;
+            case "阴":
+                imageView.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.mipmap.overcast));
+                break;
+            case "雷阵雨":
+                imageView.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.mipmap.thunder));
+                break;
         }
 
         titleCity.setText(cityName);
@@ -225,7 +251,6 @@ public class WeatherActivity extends AppCompatActivity {
         } else {
             degreeText.setText(degree + "°");
         }
-
 
         //添加listView
         forecastLayout.removeAllViews();
@@ -239,11 +264,15 @@ public class WeatherActivity extends AppCompatActivity {
             dateText.setText(forecast.date);
             infoText.setText(forecast.more.info);
             if (tempUnitChoice == 1) {
-                weatherInfoText.setText(weatherInfo + "   " + huaShiDu(forecast.temperature.min) + "°/" + huaShiDu(forecast.temperature.max) + "℉");
+                if (weather.forecastList.indexOf(forecast) == 0) {
+                    weatherInfoText.setText(weatherInfo + "   " + huaShiDu(forecast.temperature.min) + "°/" + huaShiDu(forecast.temperature.max) + "℉");
+                }
                 maxText.setText(huaShiDu(forecast.temperature.max) + "℉");
                 minText.setText(huaShiDu(forecast.temperature.min) + "℉");
             } else {
-                weatherInfoText.setText(weatherInfo + "   " + forecast.temperature.min + "°/" + forecast.temperature.max + "℃");
+                if (weather.forecastList.indexOf(forecast) == 0) {
+                    weatherInfoText.setText(weatherInfo + "   " + forecast.temperature.min + "°/" + forecast.temperature.max + "℃");
+                }
                 maxText.setText(forecast.temperature.max + "℃");
                 minText.setText(forecast.temperature.min + "℃");
             }
