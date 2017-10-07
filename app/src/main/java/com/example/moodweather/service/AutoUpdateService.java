@@ -10,7 +10,7 @@ import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
-import com.example.moodweather.gson.Weather;
+import com.example.moodweather.gson.HeWeather5;
 import com.example.moodweather.util.HttpUtil;
 import com.example.moodweather.util.Utility;
 
@@ -76,9 +76,9 @@ public class AutoUpdateService extends Service {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         String weatherString = preferences.getString("weather", null);
         if (weatherString != null) {
-            Weather weather = Utility.handleWeatherResponse(weatherString);
-            String weatherId = weather.basic.weatherId;
-            String weatherUrl = "http://guolin.tech/api/weather?cityid="
+            HeWeather5 heWeather5 = Utility.handleWeatherResponse(weatherString);
+            String weatherId = heWeather5.getBasic().getId();
+            String weatherUrl = "https://free-api.heweather.com/v5/weather?city="
                     + weatherId + "&key=46c949f3635e455c890828d1ba60311c";
             HttpUtil.sendOkHttpRequest(weatherUrl, new Callback() {
                 @Override
@@ -89,8 +89,8 @@ public class AutoUpdateService extends Service {
                 @Override
                 public void onResponse(Call call, Response response) throws IOException {
                     String responseText = response.body().string();
-                    Weather weather = Utility.handleWeatherResponse(responseText);
-                    if (weather != null && "ok".equals(weather.status)) {
+                    HeWeather5 heWeather5 = Utility.handleWeatherResponse(responseText);
+                    if (heWeather5 != null && "ok".equals(heWeather5.getStatus())) {
                         SharedPreferences.Editor editor = PreferenceManager.
                                 getDefaultSharedPreferences(AutoUpdateService.this).
                                 edit();

@@ -5,12 +5,13 @@ import android.text.TextUtils;
 import com.example.moodweather.db.City;
 import com.example.moodweather.db.County;
 import com.example.moodweather.db.Province;
-import com.example.moodweather.gson.Weather;
+import com.example.moodweather.gson.HeWeather5;
 import com.google.gson.Gson;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
 
 /**
  * 工具类解析JSON数据
@@ -98,13 +99,13 @@ public class Utility {
      * GSON解析天气数据
      * 将返回的JSON数据解析成 Weather实体类
      */
-    public static Weather handleWeatherResponse (String response) {
+    public static HeWeather5 handleWeatherResponse (String response) {
         try {
             JSONObject jsonObject = new JSONObject(response);
             //看返回数据HeWeather是一个数组 数组只有一个元素就是想要的
-            JSONArray jsonArray = jsonObject.getJSONArray("HeWeather");
+            JSONArray jsonArray = jsonObject.getJSONArray("HeWeather5");
             String weatherContent = jsonArray.getJSONObject(0).toString();
-            return new Gson().fromJson(weatherContent, Weather.class);//解析到Weather实体类
+            return new Gson().fromJson(weatherContent, HeWeather5.class);//解析到Weather实体类
         } catch (JSONException e) {
             e.printStackTrace();
         }

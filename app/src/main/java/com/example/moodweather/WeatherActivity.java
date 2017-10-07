@@ -24,9 +24,9 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.moodweather.gson.Alarm;
-import com.example.moodweather.gson.Forecast;
-import com.example.moodweather.gson.Weather;
+import com.example.moodweather.gson.Alarms;
+import com.example.moodweather.gson.Daily_forecast;
+import com.example.moodweather.gson.HeWeather5;
 import com.example.moodweather.service.AutoUpdateService;
 import com.example.moodweather.util.HttpUtil;
 import com.example.moodweather.util.Utility;
@@ -84,9 +84,9 @@ public class WeatherActivity extends AppCompatActivity {
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
         String weatherString = preferences.getString("weather", null);
         if (weatherString != null) {
-            Weather weather = Utility.handleWeatherResponse(weatherString);
-            mWeatherId = weather.basic.weatherId;
-            showWeatherInfo(weather);
+            HeWeather5 heWeather5 = Utility.handleWeatherResponse(weatherString);
+            mWeatherId = heWeather5.getBasic().getId();
+            showWeatherInfo(heWeather5);
         } else {
             mWeatherId = getIntent().getStringExtra("weather_id");
             weatherLayout.setVisibility(View.INVISIBLE);
@@ -157,7 +157,7 @@ public class WeatherActivity extends AppCompatActivity {
      * 根据 weatherId获取天气数据
      */
     public void requestWeather(final String weatherId) {
-        String weatherUrl = "http://guolin.tech/api/weather?cityid="
+        String weatherUrl = "https://free-api.heweather.com/v5/weather?city="
                 + weatherId + "&key=46c949f3635e455c890828d1ba60311c";
 
         HttpUtil.sendOkHttpRequest(weatherUrl, new Callback() {
@@ -165,18 +165,19 @@ public class WeatherActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 final String responseText = response.body().string();
-                final Weather weather = Utility.handleWeatherResponse(responseText);
+                final HeWeather5 heWeather5 = Utility.handleWeatherResponse(responseText);
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        if (weather != null && "ok".equals(weather.status)) {
+                        Log.d("v5", "run: " + responseText + (heWeather5 == null));
+                        if (heWeather5 != null && "ok".equals(heWeather5.getStatus())) {
                             //存文件
                             SharedPreferences.Editor editor = PreferenceManager.
                                     getDefaultSharedPreferences(WeatherActivity.this).
                                     edit();
                             editor.putString("weather", responseText);
                             editor.apply();
-                            showWeatherInfo(weather);
+                            showWeatherInfo(heWeather5);
                         } else {
                             Toast.makeText(WeatherActivity.this, "获取天气信息失败",
                                     Toast.LENGTH_SHORT).show();
@@ -206,21 +207,21 @@ public class WeatherActivity extends AppCompatActivity {
     /**
      * 获取天气数据后展示
      */
-    private void showWeatherInfo(Weather weather) {
-        String cityName = weather.basic.cityName;
+    private void showWeatherInfo(HeWeather5 heWeather5) {
+        String cityName = heWeather5.getBasic().getCity();
 //        String updateTime = weather.basic.update.updateTime.split(" ")[1];
-        String degree = weather.now.temperature;
-        String weatherInfo = weather.now.more.info;
-        if (weather.alarms != null && !weather.alarms.isEmpty()) {
-            Log.d("kkk", "showWeatherInfo: " + weather.alarms.get(0));
-            for (Alarm alarm : weather.alarms) {
+        String degree = heWeather5.getNow().getTmp();
+        String weatherInfo = heWeather5.getNow().getCond().getTxt();
+        if (heWeather5.getAlarms() != null && !heWeather5.getAlarms().isEmpty()) {
+            Log.d("kkk", "showWeatherInfo: " + heWeather5.getAlarms().get(0));
+            for (Alarms alarm : heWeather5.getAlarms()) {
                 NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
                 Notification notification = new NotificationCompat.Builder(this)
-                        .setContentTitle(alarm.title)
-                        .setContentText(alarm.level + " " + alarm.type)
+                        .setContentTitle(alarm.getTitle())
+                        .setContentText(alarm.getLevel() + " " + alarm.getType())
                         .setWhen(System.currentTimeMillis())
                         .build();
-                manager.notify(weather.alarms.indexOf(alarm), notification);
+                manager.notify(heWeather5.getAlarms().indexOf(alarm), notification);
             }
         }
         switch (weatherInfo) {
@@ -254,35 +255,35 @@ public class WeatherActivity extends AppCompatActivity {
 
         //添加listView
         forecastLayout.removeAllViews();
-        for (Forecast forecast : weather.forecastList) {
+        for (Daily_forecast forecast : heWeather5.getDaily_forecast()) {
             View view = LayoutInflater.from(this).inflate(
                     R.layout.forecast_item, forecastLayout, false);
             TextView dateText = (TextView) view.findViewById(R.id.date_text);
             TextView infoText = (TextView) view.findViewById(R.id.info_text);
             TextView maxText = (TextView) view.findViewById(R.id.max_text);
             TextView minText = (TextView) view.findViewById(R.id.min_text);
-            dateText.setText(forecast.date);
-            infoText.setText(forecast.more.info);
+            dateText.setText(forecast.getDate());
+            infoText.setText(forecast.getCond().getTxt_d());
             if (tempUnitChoice == 1) {
-                if (weather.forecastList.indexOf(forecast) == 0) {
-                    weatherInfoText.setText(weatherInfo + "   " + huaShiDu(forecast.temperature.min) + "°/" + huaShiDu(forecast.temperature.max) + "℉");
+                if (heWeather5.getDaily_forecast().indexOf(forecast) == 0) {
+                    weatherInfoText.setText(weatherInfo + "   " + huaShiDu(forecast.getTmp().getMin()) + "°/" + huaShiDu(forecast.getTmp().getMax()) + "℉");
                 }
-                maxText.setText(huaShiDu(forecast.temperature.max) + "℉");
-                minText.setText(huaShiDu(forecast.temperature.min) + "℉");
+                maxText.setText(huaShiDu(forecast.getTmp().getMax()) + "℉");
+                minText.setText(huaShiDu(forecast.getTmp().getMin()) + "℉");
             } else {
-                if (weather.forecastList.indexOf(forecast) == 0) {
-                    weatherInfoText.setText(weatherInfo + "   " + forecast.temperature.min + "°/" + forecast.temperature.max + "℃");
+                if (heWeather5.getDaily_forecast().indexOf(forecast) == 0) {
+                    weatherInfoText.setText(weatherInfo + "   " + forecast.getTmp().getMin() + "°/" + forecast.getTmp().getMax() + "℃");
                 }
-                maxText.setText(forecast.temperature.max + "℃");
-                minText.setText(forecast.temperature.min + "℃");
+                maxText.setText(forecast.getTmp().getMax() + "℃");
+                minText.setText(forecast.getTmp().getMin() + "℃");
             }
             forecastLayout.addView(view);
         }
 
-        if (weather.aqi != null) {
-            aqiText.setText(weather.aqi.city.aqi);
+        if (heWeather5.getAqi() != null) {
+            aqiText.setText(heWeather5.getAqi().getCity().getAqi());
             aqiText.setTextSize(40);
-            pm25Text.setText(weather.aqi.city.pm25);
+            pm25Text.setText(heWeather5.getAqi().getCity().getPm25());
             pm25Text.setTextSize(40);
         } else {
             aqiText.setText("暂无数据");
@@ -290,9 +291,9 @@ public class WeatherActivity extends AppCompatActivity {
             pm25Text.setText("暂无数据");
             pm25Text.setTextSize(20);
         }
-        String comfort = "舒适度：" + weather.suggestion.comfort.info;
-        String carWash = "洗车指数：" + weather.suggestion.carWash.info;
-        String sport = "运动建议：" + weather.suggestion.sport.info;
+        String comfort = "舒适度：" + heWeather5.getSuggestion().getComf().getTxt();
+        String carWash = "洗车指数：" + heWeather5.getSuggestion().getCw().getTxt();
+        String sport = "运动建议：" + heWeather5.getSuggestion().getSport().getTxt();
         comfortText.setText(comfort);
         carWashText.setText(carWash);
         sportText.setText(sport);

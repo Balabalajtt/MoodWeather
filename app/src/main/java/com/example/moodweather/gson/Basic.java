@@ -1,18 +1,87 @@
 package com.example.moodweather.gson;
 
-import com.google.gson.annotations.SerializedName;
-
 public class Basic {
-    @SerializedName("city")
-    public String cityName;
+    private String city;
 
-    @SerializedName("id")
-    public String weatherId;
+    private String cnty;
 
-    public Update update;
+    private String id;
 
-    public class Update {
-        @SerializedName("loc")
-        public String updateTime;
+    private String lat;
+
+    private String lon;
+
+    private Update update;
+
+    public void setCity(String city) {
+        this.city = city;
     }
+
+    public String getCity() {
+        return this.city;
+    }
+
+    public void setCnty(String cnty) {
+        this.cnty = cnty;
+    }
+
+    public String getCnty() {
+        return this.cnty;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getId() {
+        return this.id;
+    }
+
+    public void setLat(String lat) {
+        this.lat = lat;
+    }
+
+    public String getLat() {
+        return this.lat;
+    }
+
+    public void setLon(String lon) {
+        this.lon = lon;
+    }
+
+    public String getLon() {
+        return this.lon;
+    }
+
+    public void setUpdate(Update update) {
+        this.update = update;
+    }
+
+    public Update getUpdate() {
+        return this.update;
+    }
+
+    public static class Update {
+        private String loc;
+
+        private String utc;
+
+        public void setLoc(String loc) {
+            this.loc = loc;
+        }
+
+        public String getLoc() {
+            return this.loc;
+        }
+
+        public void setUtc(String utc) {
+            this.utc = utc;
+        }
+
+        public String getUtc() {
+            return this.utc;
+        }
+
+    }
+
 }
