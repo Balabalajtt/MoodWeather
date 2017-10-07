@@ -48,7 +48,7 @@ public class WeatherActivity extends AppCompatActivity {
     private TextView aqiText;
     private TextView pm25Text;
     private TextView comfortText;
-    private TextView carWashText;
+    private TextView dressText;
     private TextView sportText;
     private Button settingsButton;
     private ImageView imageView;
@@ -116,7 +116,7 @@ public class WeatherActivity extends AppCompatActivity {
         aqiText = (TextView) findViewById(R.id.aqi_text);
         pm25Text = (TextView) findViewById(R.id.pm25_text);
         comfortText = (TextView) findViewById(R.id.comfort_text);
-        carWashText = (TextView) findViewById(R.id.car_wash_text);
+        dressText = (TextView) findViewById(R.id.drsg_text);
         sportText = (TextView) findViewById(R.id.sport_text);
         imageView = (ImageView) findViewById(R.id.degree_image);
 
@@ -230,10 +230,15 @@ public class WeatherActivity extends AppCompatActivity {
                 break;
             case "多云":
             case "晴间多云":
+            case "少云":
                 imageView.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.mipmap.cloudy));
                 break;
             case "小雨":
+            case "中雨":
+            case "大雨":
+            case "暴雨":
             case "阵雨":
+            case "强阵雨":
                 imageView.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.mipmap.rain));
                 break;
             case "阴":
@@ -241,6 +246,10 @@ public class WeatherActivity extends AppCompatActivity {
                 break;
             case "雷阵雨":
                 imageView.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.mipmap.thunder));
+                break;
+            case "雨夹雪":
+            case "雨雪天气":
+                imageView.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.mipmap.snow));
                 break;
         }
 
@@ -291,11 +300,11 @@ public class WeatherActivity extends AppCompatActivity {
             pm25Text.setText("暂无数据");
             pm25Text.setTextSize(20);
         }
-        String comfort = "舒适度：" + heWeather5.getSuggestion().getComf().getTxt();
-        String carWash = "洗车指数：" + heWeather5.getSuggestion().getCw().getTxt();
+        String comfort = "舒适指数：" + heWeather5.getSuggestion().getComf().getTxt();
+        String dress = "穿衣指数：" + heWeather5.getSuggestion().getDrsg().getTxt();
         String sport = "运动建议：" + heWeather5.getSuggestion().getSport().getTxt();
         comfortText.setText(comfort);
-        carWashText.setText(carWash);
+        dressText.setText(dress);
         sportText.setText(sport);
         weatherLayout.setVisibility(View.VISIBLE);
 

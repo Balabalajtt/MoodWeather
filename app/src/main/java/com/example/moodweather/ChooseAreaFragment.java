@@ -5,9 +5,12 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -22,6 +25,9 @@ import com.example.moodweather.db.Province;
 import com.example.moodweather.util.HttpUtil;
 import com.example.moodweather.util.Utility;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.litepal.crud.DataSupport;
 
 import java.io.IOException;
@@ -38,6 +44,7 @@ public class ChooseAreaFragment extends Fragment {
     public static final int LEVEL_PROVINCE = 0;
     public static final int LEVEL_CITY = 1;
     public static final int LEVEL_COUNTY = 2;
+    public static final int LEVEL_SEARCH = 3;
 
     private ProgressDialog progressDialog;
     private TextView titleText;
@@ -50,6 +57,7 @@ public class ChooseAreaFragment extends Fragment {
     private List<Province> provinceList;
     private List<City> cityList;
     private List<County> countyList;
+    private List<JSONObject> searchList = new ArrayList<>();
 
     private Province selectedProvince;
     private City selectedCity;
@@ -80,7 +88,79 @@ public class ChooseAreaFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 String name = editText.getText().toString();
+                if (!TextUtils.isEmpty(name)) {
+                    String searchUrl = "https://api.heweather.com/v5/search?city="
+                            + name + "&key=46c949f3635e455c890828d1ba60311c";
+                    HttpUtil.sendOkHttpRequest(searchUrl, new Callback() {
+                        @Override
+                        public void onFailure(Call call, IOException e) {
+                            e.printStackTrace();
+                            getActivity().runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(getContext(), "搜索城市失败",
+                                            Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        }
 
+                        @Override
+                        public void onResponse(Call call, Response response) throws IOException {
+                            final String responseText = response.body().string();
+                            Log.d("search", "onResponse: " + responseText);
+
+                            try {
+                                JSONArray he = new JSONObject(responseText).getJSONArray("HeWeather5");
+                                searchList.clear();
+                                for (int i = 0; i < he.length(); i++) {
+                                    JSONObject basic = (JSONObject) he.getJSONObject(i);
+                                    searchList.add(basic);
+                                }
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+
+                            if (searchList.size() > 0) {
+                                dataList.clear();
+                                for (JSONObject basic : searchList) {
+                                    try {
+                                        JSONObject b = basic.getJSONObject("basic");
+                                        dataList.add(b.getString("prov") + " - " + b.getString("city"));
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                                getActivity().runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+
+                                        InputMethodManager inputMethodManager =(InputMethodManager)getContext().getApplicationContext().
+                                                getSystemService(MainActivity.INPUT_METHOD_SERVICE);
+                                        inputMethodManager.hideSoftInputFromWindow(editText.getWindowToken(), 0);
+                                        if (!dataList.isEmpty()) {
+                                            currentLevel = LEVEL_SEARCH;
+
+                                        } else {
+                                            Toast.makeText(getContext(), "未搜索到此城市",
+                                                    Toast.LENGTH_SHORT).show();
+                                            if (currentLevel == LEVEL_CITY) {
+                                                queryCities();
+                                            } else if (currentLevel == LEVEL_COUNTY) {
+                                                queryCounties();
+                                            } else {
+                                                queryProvinces();
+                                            }
+                                        }
+                                        adapter.notifyDataSetChanged();
+                                        listView.setSelection(0);
+                                    }
+                                });
+
+                            }
+                        }
+
+                    });
+                }
             }
         });
 //        RelativeLayout headLayout = (RelativeLayout) view.findViewById(R.id.head_relative_layout);
@@ -128,6 +208,27 @@ public class ChooseAreaFragment extends Fragment {
                         activity.setWeatherId(weatherId);//使之后刷新不会回到之前选择的城市天气
                         activity.requestWeather(weatherId);
                     }
+                } else if (currentLevel == LEVEL_SEARCH) {
+                    String weatherId = null;
+                    try {
+                        weatherId = String.valueOf(searchList.get(i).getJSONObject("basic").getString("id"));
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    if (getActivity() instanceof MainActivity) {
+                        Intent intent = new Intent(getActivity(), WeatherActivity.class);
+                        intent.putExtra("weather_id", weatherId);
+                        startActivity(intent);
+                        getActivity().finish();
+                    } else if (getActivity() instanceof WeatherActivity) {
+                        queryProvinces();//使侧滑重新回选择省份
+                        WeatherActivity activity = (WeatherActivity) getActivity();
+                        activity.drawerLayout.closeDrawers();
+                        activity.swipeRefresh.setRefreshing(true);
+                        activity.setWeatherId(weatherId);//使之后刷新不会回到之前选择的城市天气
+                        activity.requestWeather(weatherId);
+                    }
+                    editText.setText("");
                 }
             }
         });
