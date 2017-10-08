@@ -52,6 +52,7 @@ public class WeatherActivity extends AppCompatActivity {
     private TextView sportText;
     private Button settingsButton;
     private ImageView imageView;
+    private View suggestionLayout;
 
     public SwipeRefreshLayout swipeRefresh;
 
@@ -119,6 +120,7 @@ public class WeatherActivity extends AppCompatActivity {
         dressText = (TextView) findViewById(R.id.drsg_text);
         sportText = (TextView) findViewById(R.id.sport_text);
         imageView = (ImageView) findViewById(R.id.degree_image);
+        suggestionLayout = findViewById(R.id.suggestion);
 
         //侧滑
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -300,12 +302,18 @@ public class WeatherActivity extends AppCompatActivity {
             pm25Text.setText("暂无数据");
             pm25Text.setTextSize(20);
         }
-        String comfort = "舒适指数：" + heWeather5.getSuggestion().getComf().getTxt();
-        String dress = "穿衣指数：" + heWeather5.getSuggestion().getDrsg().getTxt();
-        String sport = "运动建议：" + heWeather5.getSuggestion().getSport().getTxt();
-        comfortText.setText(comfort);
-        dressText.setText(dress);
-        sportText.setText(sport);
+
+        if (heWeather5.getSuggestion() != null) {
+            String comfort = "舒适指数：" + heWeather5.getSuggestion().getComf().getTxt();
+            String dress = "穿衣指数：" + heWeather5.getSuggestion().getDrsg().getTxt();
+            String sport = "运动建议：" + heWeather5.getSuggestion().getSport().getTxt();
+            suggestionLayout.setVisibility(View.VISIBLE);
+            comfortText.setText(comfort);
+            dressText.setText(dress);
+            sportText.setText(sport);
+        } else {
+            suggestionLayout.setVisibility(View.GONE);
+        }
         weatherLayout.setVisibility(View.VISIBLE);
 
         Intent intent = new Intent(this, AutoUpdateService.class);

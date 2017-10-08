@@ -125,7 +125,17 @@ public class ChooseAreaFragment extends Fragment {
                                 for (JSONObject basic : searchList) {
                                     try {
                                         JSONObject b = basic.getJSONObject("basic");
-                                        dataList.add(b.getString("prov") + " - " + b.getString("city"));
+                                        String cityName = "";
+                                        if (!TextUtils.isEmpty(b.getString("cnty"))) {
+                                            cityName = cityName + b.getString("cnty") + " ";
+                                        }
+                                        if (!TextUtils.isEmpty(b.getString("prov"))) {
+                                            cityName = cityName + b.getString("prov") + " ";
+                                        }
+                                        if (!TextUtils.isEmpty(b.getString("city"))) {
+                                            cityName = cityName + b.getString("city") + " ";
+                                        }
+                                        dataList.add(cityName);
                                     } catch (JSONException e) {
                                         e.printStackTrace();
                                     }
@@ -139,7 +149,7 @@ public class ChooseAreaFragment extends Fragment {
                                         inputMethodManager.hideSoftInputFromWindow(editText.getWindowToken(), 0);
                                         if (!dataList.isEmpty()) {
                                             currentLevel = LEVEL_SEARCH;
-
+                                            titleText.setText(editText.getText().toString());
                                         } else {
                                             Toast.makeText(getContext(), "未搜索到此城市",
                                                     Toast.LENGTH_SHORT).show();
